@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSSM2", "NSSM2\NSSM2.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSSM2.Tests", "NSSM2.Tests\NSSM2.Tests.csproj", "{B2B7F659-EF71-4218-BCFA-306BAEEA8C6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSSM.Scheduler", "NSSM.Scheduler\NSSM.Scheduler.csproj", "{C389304D-BDEE-4E52-90CF-61C8365EFE93}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B2B7F659-EF71-4218-BCFA-306BAEEA8C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2B7F659-EF71-4218-BCFA-306BAEEA8C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2B7F659-EF71-4218-BCFA-306BAEEA8C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C389304D-BDEE-4E52-90CF-61C8365EFE93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C389304D-BDEE-4E52-90CF-61C8365EFE93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C389304D-BDEE-4E52-90CF-61C8365EFE93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C389304D-BDEE-4E52-90CF-61C8365EFE93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
