@@ -136,12 +136,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Utility.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Core\Models\Member.cs" />
-    <Compile Include="Core\Models\ModelBase.cs" />
-    <Compile Include="Core\Models\Node.cs" />
-    <Compile Include="Core\Models\Project.cs" />
-    <Compile Include="Core\Models\Scans.cs" />
-    <Compile Include="Core\NSContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

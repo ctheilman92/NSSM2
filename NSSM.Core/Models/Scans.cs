@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NSSM2.Core.Models
+namespace NSSM.Core.Models
 {
     [Table(name: "NS_SCAN_JOBS")]
     public class Scan : ModelBase

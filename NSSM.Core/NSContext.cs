@@ -1,6 +1,6 @@
 namespace NSSM2.Core
 {
-    using NSSM2.Core.Models;
+    using NSSM.Core.Models;
     using System;
     using System.Data.Entity;
     using System.Linq;
