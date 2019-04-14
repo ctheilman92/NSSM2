@@ -9,7 +9,7 @@ namespace NSSM.Scheduler
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                new NSSMScheduler()
             };
             ServiceBase.Run(ServicesToRun);
         }

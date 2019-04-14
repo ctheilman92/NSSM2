@@ -1,10 +1,7 @@
 ﻿namespace NSSM.Scheduler
 {
-    partial class Service1
+    public partial class NSSMScheduler
     {
-        /// <summary> 
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
         /// <summary>
@@ -29,7 +26,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            this.ServiceName = "Service1";
+            this.ServiceName = "NSSM Scheduler";
         }
 
         #endregion

@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace NSSM.Core.Models
 {
     [Table(name: "NS_MEMBERS")]
-    public class Member
+    public class Member : ModelBase
     {
         [Required]
         [Column(name: "FIRST_NAME")]

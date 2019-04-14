@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NSSM.Core.Models
 {
     [Table(name: "NS_NODE")]
-    public class Node
+    public class Node : ModelBase
     {
         [Required]
         [Column(name: "ALIAS")]
@@ -19,8 +20,20 @@ namespace NSSM.Core.Models
         [Column(name: "DOMAIN")]
         public string Domain { get; set; }
 
-        //other settings can be tracked and applied here
+        [Required]
+        [Column(name: "NS_EXE_LOCATION")]
+        public string ExecutableLocation { get; set; }
 
+        //other settings can be tracked and applied here
+        [Required]
+        [Column(name: "CONCURRENT_SCANS")]
+        public int Concurrentscans { get; set; }
+
+        [Column(name: "START_TIME")]
+        public DateTime? StartTime { get; set; }
+
+        [Column(name: "STOP_TIME")]
+        public DateTime? StopTime { get; set; }
 
         #region FOREIGN KEYS 
 

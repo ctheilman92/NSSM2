@@ -13,8 +13,11 @@ namespace NSSM.Core.Models
 
         [Required]
         [Column(name: "NODE_INSTANCE")]
-        public int SchedulerId { get; set; }
+        public int NodeInstanceId { get; set; }
         public Node NodeInstance { get; set; }
+
+        [Column(name: "TARGET_URL")]
+        public string TargetUrl { get; set; }
 
         [Column(name: "CREATED_BY")]
         public int CreatedById { get; set; }
@@ -24,10 +27,10 @@ namespace NSSM.Core.Models
         public string ExportPath { get; set; }
 
         [Column(name: "INVOKE_DATE")]
-        public DateTime InvokeDate { get; set; }
+        public DateTime? InvokeDate { get; set; }
 
         [Column(name: "END_DATE")]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [Column(name: "TIMEOUT")]
         public int Timeout { get; set; }
