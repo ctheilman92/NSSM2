@@ -1,14 +1,12 @@
 ﻿using NSSM.Core.Models;
 using NSSM2.Core;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NSSM.Scheduler
 {
@@ -35,19 +33,19 @@ namespace NSSM.Scheduler
 
         public static int GetNetsparkerProcessCount()
         {
-            throw new NotImplementedException();
+            var nsProcs = Process.GetProcessesByName("Netsparker");
+            return nsProcs.Count();
         }
 
         public static Node GetNodeInstance()
         {
-            using (var db = GetNSContext())
+            using (var db = Utility.GetNSContext())
             {
                 var thisAlias = ConfigurationManager.AppSettings["ALIAS"];
                 return db.Nodes.FirstOrDefault(x => x.Alias.Equals(thisAlias, StringComparison.OrdinalIgnoreCase));
             }
         }
 
-        public static string GetDnsHostName() => Dns.GetHostEntry("localhost").HostName;
         public static NSContext GetNSContext() => new NSContext("ConnectionString");
 
     }

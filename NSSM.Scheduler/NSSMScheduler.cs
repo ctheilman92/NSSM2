@@ -1,12 +1,11 @@
-﻿using System;
+﻿using NSSM.Core.Models;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
-using System.Text;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace NSSM.Scheduler
@@ -29,7 +28,6 @@ namespace NSSM.Scheduler
         {
             InitializeComponent();
         }
-
 
         private void UpdateNodeInstance(bool isActive)
         {
@@ -71,19 +69,48 @@ namespace NSSM.Scheduler
                 Utility.LogException(ex);
             }
 
+            
+
             //update current node instance to be available
             timer.Elapsed += new ElapsedEventHandler(Timer_Elapsed);
             timer.Interval = 60000;
             timer.Enabled = true;
-
         }
 
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
-                var newScanProcess = new NSProcess();
-                newScanProcess.ExecuteScanAsync();
+                var availableConnections = Utility.GetNodeInstance().Concurrentscans;
+                var scansCount = Utility.GetNetsparkerProcessCount();
+                if (scansCount > 0)
+                {
+                    if (scansCount >= availableConnections)
+                    {
+                        EventLog.WriteEntry($"This NSSM service is using all available processes - [{DateTime.Now}]");
+                        return;
+                    }
+
+                    availableConnections = availableConnections - scansCount;
+                    EventLog.WriteEntry($"** Beginning exectution of {availableConnections} netsparker scan son this node! ");
+                }
+
+                var nextScans = new List<Scan>();
+                using (var db = Utility.GetNSContext())
+                {
+                    nextScans = db.Scans
+                        .Where(x => x.IsActive && x.Status == ScanStatus.Pending && x.NodeInstanceId == 0 && !x.InvokeDate.HasValue)
+                        .OrderBy(x => x.ModifiedDate).Take(availableConnections).ToList();
+                }
+
+                if (nextScans != null)
+                {
+                    foreach (var newScan in nextScans)
+                    {
+                        var newScanProcess = new NSProcess(newScan);
+                        await newScanProcess.ExecuteScanAsync();
+                    }
+                }
             }
             catch (Exception ex)
             {

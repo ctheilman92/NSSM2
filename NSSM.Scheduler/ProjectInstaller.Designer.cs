@@ -39,6 +39,7 @@
             // serviceInstaller1
             // 
             this.serviceInstaller1.ServiceName = "NSSM Scheduler";
+            this.serviceInstaller1.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.ServiceInstaller1_AfterInstall);
             // 
             // ProjectInstaller
             // 

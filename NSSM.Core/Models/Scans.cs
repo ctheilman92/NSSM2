@@ -33,7 +33,7 @@ namespace NSSM.Core.Models
         public DateTime? EndDate { get; set; }
 
         [Column(name: "TIMEOUT")]
-        public int Timeout { get; set; }
+        public int? Timeout { get; set; }
 
         [Column(name: "RETRY_ON_FAIL")]
         public bool RetryOnFail { get; set; }

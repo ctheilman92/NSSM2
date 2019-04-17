@@ -1,11 +1,8 @@
 ﻿using NSSM.Core.Models;
-using NSSM2.Core;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NSSM.Scheduler
@@ -61,36 +58,43 @@ namespace NSSM.Scheduler
 
         public string ProcessErrors { get; set; }
         
-
-        public NSProcess()
-        {
-            CurrentScan = GetNextScan();
-        }
-
-        //for UNIT TESTS
         public NSProcess(Scan scan)
         {
             CurrentScan = scan;
         }
+        public NSProcess(Scan scan, Project project)
+        {
+            CurrentScan = scan;
+            _ProjectInfo = project;
+        }
+
         public Task<int> ExecuteScanAsync()
         {
             var tcs = new TaskCompletionSource<int>();
-            //will make async later if able to execute passive scan 
             Process proc = new Process { EnableRaisingEvents = true, };
             proc.StartInfo.FileName = NodeInstance.ExecutableLocation;
             proc.StartInfo.Arguments = $"/u {CurrentScan.TargetUrl} ";
             proc.StartInfo.Arguments += $"/p \"Default Scan Policy\" /a /s ";
             proc.StartInfo.Arguments += $"/r \"{ReportPath}\" /rt \"Detailed Scan Report\" ";
             proc.StartInfo.Arguments += $"/r {VulnerabilitiesPath} /rt \"Vulnerabilities List (CSV)\" ";
+
+            proc.ErrorDataReceived += OnErrorData;
+
             proc.Exited += (sender, args) =>
             {
+                UpdateScan(ScanStatus.Complete);
                 tcs.SetResult(proc.ExitCode);
                 proc.Dispose();
             };
 
             proc.Start();
-
             return tcs.Task;
+        }
+
+        public void OnErrorData(object pSender, DataReceivedEventArgs pError)
+        {
+            ProcessErrors = pError.Data;
+            UpdateScan(ScanStatus.Error);
         }
 
         public void UpdateScan(ScanStatus status)
@@ -98,10 +102,6 @@ namespace NSSM.Scheduler
             CurrentScan.Status = status;
             switch (status)
             {
-                case ScanStatus.None:
-                    break;
-                case ScanStatus.Pending:
-                    break;
                 case ScanStatus.Running:
                     CurrentScan.InvokeDate = DateTime.Now;
                     CurrentScan.NodeInstanceId = NodeInstance.Id;
@@ -120,15 +120,6 @@ namespace NSSM.Scheduler
             {
                 db.Entry(CurrentScan).State = System.Data.Entity.EntityState.Modified;
                 db.SaveChanges();
-            }
-        }
-
-        public Scan GetNextScan()
-        {
-            using (var db = Utility.GetNSContext())
-            {
-                return db.Scans.Where(x => x.Status == ScanStatus.Pending)
-                    .OrderBy(x => x.CreatedDate).FirstOrDefault();
             }
         }
     }

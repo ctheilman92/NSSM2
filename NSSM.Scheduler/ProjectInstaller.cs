@@ -15,5 +15,10 @@ namespace NSSM.Scheduler
         {
             InitializeComponent();
         }
+
+        private void ServiceInstaller1_AfterInstall(object sender, InstallEventArgs e)
+        {
+
+        }
     }
 }
