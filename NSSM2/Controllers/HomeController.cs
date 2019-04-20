@@ -12,7 +12,7 @@ namespace NSSM2.Controllers
         {
             using (var db = GetNSContext())
             {
-                var lst = db.Members.ToList();
+                var lst = db.Projects.ToList();
             }
             return View();
         }

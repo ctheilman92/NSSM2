@@ -38,6 +38,7 @@ namespace NSSM.Core.Models
 
         [Column(name: "ADMIN_ID")]
         public int AdminMemberId { get; set; }
+        [ForeignKey("AdminMemberId")]
         public virtual Member AdminMember { get; set; }
 
         [Column(name: "CREATED_BY")]

@@ -31,10 +31,11 @@ namespace NSSM.Core.Models
 
         #region FOREIGN KEYS
 
-        public virtual ICollection<Scan> CreatedScans { get; set; }
-        public virtual ICollection<Project> AdminProjects { get; set; }
         public virtual ICollection<Node> CreatedNodes { get; set; }
+
         public virtual ICollection<Node> AdminNodes { get; set; }
+
+        public virtual ICollection<Project> CreatedProjects { get; set; }
 
         #endregion
     }

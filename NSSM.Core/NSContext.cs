@@ -67,10 +67,12 @@ namespace NSSM2.Core
 
 
         #region DBETS
+
         public DbSet<Member> Members { get; set; }
         public DbSet<Node> Nodes { get; set; }
         public DbSet<Scan> Scans { get; set; }
         public DbSet<Project> Projects { get; set; }
+
         #endregion
     }
 }

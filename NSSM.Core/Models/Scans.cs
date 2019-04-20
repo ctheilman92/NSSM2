@@ -34,13 +34,9 @@ namespace NSSM.Core.Models
         #region FOREIGN KEYS
 
         [Required]
-        [Column(name: "NODE_INSTANCE")]
+        [Column(name: "NODE_ID")]
         public int NodeInstanceId { get; set; }
         public virtual Node NodeInstance { get; set; }
-
-        [Column(name: "CREATED_BY")]
-        public int CreatedById { get; set; }
-        public virtual Member CreatedBy { get; set; }
 
         [Column("PROJECT_ID")]
         public int ProjectId { get; set; }

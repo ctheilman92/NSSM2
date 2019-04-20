@@ -14,8 +14,9 @@ namespace NSSM.Core.Models
 
         #region FOREIGN KEYS
 
-        [Column(name: "ADMIN_ID")]
-        public int ProjectAdminId { get; set; }
+        [Column(name: "CREATED_BY")]
+        public int CreatedById { get; set; }
+        public virtual Member CreatedBy { get; set; }
 
         public virtual ICollection<Scan> ProjectScans { get; set; }
 
