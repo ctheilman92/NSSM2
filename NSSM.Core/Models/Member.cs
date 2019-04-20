@@ -25,15 +25,17 @@ namespace NSSM.Core.Models
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
-        [DataType(DataType.PhoneNumber)]
         [Column(name: "PHONE")]
+        [DataType(DataType.PhoneNumber)]
         public string Phone { get; set; }
 
-        #region EF FOREIGN KEYS
+        #region FOREIGN KEYS
 
-        ICollection<Scan> CreatedScans { get; set; }
-        ICollection<Project> AdminProjects { get; set; }
-        ICollection<Node> CreatedNodes { get; set; }
+        public virtual ICollection<Scan> CreatedScans { get; set; }
+        public virtual ICollection<Project> AdminProjects { get; set; }
+        public virtual ICollection<Node> CreatedNodes { get; set; }
+        public virtual ICollection<Node> AdminNodes { get; set; }
+
         #endregion
     }
 }

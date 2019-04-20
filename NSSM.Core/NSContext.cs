@@ -6,14 +6,6 @@ namespace NSSM2.Core
     using System.Linq;
     using System.Threading.Tasks;
 
-    public class CoreContextInitializer : CreateDatabaseIfNotExists<NSContext>
-    {
-        protected override void Seed(NSContext context)
-        {
-            base.Seed(context);
-        }
-    }
-
     public class NSContext : DbContext
     {
         public NSContext()
@@ -23,11 +15,19 @@ namespace NSSM2.Core
         public NSContext(string connectionString)
             : base(connectionString)
         {
-            Database.SetInitializer(new CoreContextInitializer());
+            Database.SetInitializer(new CreateDatabaseIfNotExists<NSContext>());
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Node>().HasRequired(n => n.AdminMember)
+                .WithMany(m => m.AdminNodes).HasForeignKey(n => n.AdminMemberId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Node>().HasRequired(n => n.CreatedBy)
+                .WithMany(m => m.CreatedNodes).HasForeignKey(n => n.CreatedbyId)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Properties<DateTime>()
                 .Configure(property => property.HasColumnType("datetime2"));
         }

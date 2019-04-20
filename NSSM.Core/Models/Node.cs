@@ -24,7 +24,6 @@ namespace NSSM.Core.Models
         [Column(name: "NS_EXE_LOCATION")]
         public string ExecutableLocation { get; set; }
 
-        //other settings can be tracked and applied here
         [Required]
         [Column(name: "CONCURRENT_SCANS")]
         public int Concurrentscans { get; set; }
@@ -37,16 +36,15 @@ namespace NSSM.Core.Models
 
         #region FOREIGN KEYS 
 
-        [Column(name: "ADMIN")]
+        [Column(name: "ADMIN_ID")]
         public int AdminMemberId { get; set; }
-        [ForeignKey(name: "AdminMemberId")]
-        public Member AdminMember { get; set; }
+        public virtual Member AdminMember { get; set; }
 
         [Column(name: "CREATED_BY")]
         public int CreatedbyId { get; set; }
-        public Member CreatedBy { get; set; }
+        public virtual Member CreatedBy { get; set; }
 
-        public ICollection<Scan> Scans { get; set; }
+        public virtual ICollection<Scan> Scans { get; set; }
 
         #endregion
     }

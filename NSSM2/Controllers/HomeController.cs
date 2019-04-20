@@ -6,10 +6,14 @@ using System.Web.Mvc;
 
 namespace NSSM2.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public ActionResult Index()
         {
+            using (var db = GetNSContext())
+            {
+                var lst = db.Members.ToList();
+            }
             return View();
         }
 

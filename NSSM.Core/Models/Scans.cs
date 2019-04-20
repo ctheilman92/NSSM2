@@ -4,24 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NSSM.Core.Models
 {
-    [Table(name: "NS_SCAN_JOBS")]
+    [Table(name: "NS_SCANS")]
     public class Scan : ModelBase
     {
-
         [Column(name: "STATUS")]
         public ScanStatus Status { get; set; }
 
-        [Required]
-        [Column(name: "NODE_INSTANCE")]
-        public int NodeInstanceId { get; set; }
-        public Node NodeInstance { get; set; }
-
         [Column(name: "TARGET_URL")]
         public string TargetUrl { get; set; }
-
-        [Column(name: "CREATED_BY")]
-        public int CreatedById { get; set; }
-        public Member CreatedBy { get; set; }
 
         [Column(name: "EXPORT_PATH")]
         public string ExportPath { get; set; }
@@ -41,9 +31,22 @@ namespace NSSM.Core.Models
         [Column(name: "ERROR")]
         public string Error { get; set; }
 
-        [Column("PROJECT_INSTANCE")]
-        public int ProjectId { get; set; }        
-        public Project Project { get; set; }
+        #region FOREIGN KEYS
+
+        [Required]
+        [Column(name: "NODE_INSTANCE")]
+        public int NodeInstanceId { get; set; }
+        public virtual Node NodeInstance { get; set; }
+
+        [Column(name: "CREATED_BY")]
+        public int CreatedById { get; set; }
+        public virtual Member CreatedBy { get; set; }
+
+        [Column("PROJECT_ID")]
+        public int ProjectId { get; set; }
+        public virtual Project Project { get; set; }
+
+        #endregion
     }
 
     public enum ScanStatus

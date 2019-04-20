@@ -12,10 +12,13 @@ namespace NSSM.Core.Models
         [Column(name: "SUMMARY_LOCATION")]
         public string SummaryLocation { get; set; }
 
-        [Column(name: "ADMIN")]
-        public int ProjectAdminId  { get; set; }
-        public Member ProjectAdmin { get; set; }
+        #region FOREIGN KEYS
 
-        ICollection<Scan> ProjectScans { get; set; }
+        [Column(name: "ADMIN_ID")]
+        public int ProjectAdminId { get; set; }
+
+        public virtual ICollection<Scan> ProjectScans { get; set; }
+
+        #endregion
     }
 }
