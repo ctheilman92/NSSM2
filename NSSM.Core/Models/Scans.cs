@@ -7,6 +7,9 @@ namespace NSSM.Core.Models
     [Table(name: "NS_SCANS")]
     public class Scan : ModelBase
     {
+        [Column(name: "SCAN_ALIAS")]
+        public String ScanAlias { get; set; }
+
         [Column(name: "STATUS")]
         public ScanStatus Status { get; set; }
 
@@ -33,7 +36,6 @@ namespace NSSM.Core.Models
 
         #region FOREIGN KEYS
 
-        [Required]
         [Column(name: "NODE_ID")]
         public int NodeInstanceId { get; set; }
         public virtual Node NodeInstance { get; set; }

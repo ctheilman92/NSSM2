@@ -12,7 +12,7 @@ namespace NSSM.Scheduler
 {
     public partial class NSSMScheduler : ServiceBase
     {
-        Timer timer = new Timer();
+        private Timer _Timer { get; set; }
         public EventLog _EventLog { get; set; }
         public override EventLog EventLog
         {
@@ -69,12 +69,9 @@ namespace NSSM.Scheduler
                 Utility.LogException(ex);
             }
 
-            
-
-            //update current node instance to be available
-            timer.Elapsed += new ElapsedEventHandler(Timer_Elapsed);
-            timer.Interval = 60000;
-            timer.Enabled = true;
+            _Timer = new Timer(60000) { AutoReset = true };
+            _Timer.Elapsed += new ElapsedEventHandler(Timer_Elapsed);
+            _Timer.Enabled = true;
         }
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)

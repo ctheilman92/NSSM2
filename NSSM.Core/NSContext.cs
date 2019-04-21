@@ -25,6 +25,7 @@ namespace NSSM2.Core
     public class NSContext : DbContext
     {
         public NSContext()
+            : base("NSCONTEXTCONNSTRING")
         {
         }
 

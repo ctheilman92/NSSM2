@@ -9,7 +9,8 @@ namespace NSSM.Scheduler
 {
     public class NSProcess
     {
-        private Scan CurrentScan { get; set; }
+        public Scan CurrentScan { get; set; }
+
         private Project _ProjectInfo { get; set; }
         public Project ProjectInfo
         {
@@ -27,6 +28,7 @@ namespace NSSM.Scheduler
                 return _ProjectInfo;
             }
         }
+
         private Node _NodeInstance { get; set; }
         public Node NodeInstance
         {
@@ -37,22 +39,32 @@ namespace NSSM.Scheduler
                 return _NodeInstance;
             }
         }
+
         private string ReportPath
         {
             get
             {
-                return (CurrentScan == null) 
-                    ? string.Empty 
-                    : Path.Combine(CurrentScan.ExportPath, $"Report-{CurrentScan.TargetUrl}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.pdf");
+                if (CurrentScan == null)
+                    return string.Empty;
+                var scanExportPath = Path.Combine(ProjectInfo.SummaryLocation, CurrentScan.ScanAlias);
+
+                return (!string.IsNullOrEmpty(CurrentScan.ScanAlias))
+                    ? Path.Combine(scanExportPath, $"Report-{CurrentScan.TargetUrl}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.pdf")
+                    : Path.Combine(scanExportPath, $"Report-SCAN#{CurrentScan.Id}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.pdf");
             }
         }
+
         private string VulnerabilitiesPath
         {
             get
             {
-                return (CurrentScan == null) 
-                    ? string.Empty 
-                    : Path.Combine(CurrentScan.ExportPath, $"Vulnerabilities-{CurrentScan.TargetUrl}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.csv");
+                if (CurrentScan == null)
+                    return string.Empty;
+                var scanExportPath = Path.Combine(ProjectInfo.SummaryLocation, CurrentScan.ScanAlias);
+
+                return (!string.IsNullOrEmpty(CurrentScan.ScanAlias))
+                    ? Path.Combine(CurrentScan.ExportPath, $"Vulnerabilities-SCAN#{CurrentScan.ScanAlias}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.csv")
+                    : Path.Combine(CurrentScan.ExportPath, $"Vulnerabilities-SCAN#{CurrentScan.Id}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.csv");
             }
         }
 
@@ -76,7 +88,7 @@ namespace NSSM.Scheduler
             proc.StartInfo.Arguments = $"/u {CurrentScan.TargetUrl} ";
             proc.StartInfo.Arguments += $"/p \"Default Scan Policy\" /a /s ";
             proc.StartInfo.Arguments += $"/r \"{ReportPath}\" /rt \"Detailed Scan Report\" ";
-            proc.StartInfo.Arguments += $"/r {VulnerabilitiesPath} /rt \"Vulnerabilities List (CSV)\" ";
+            proc.StartInfo.Arguments += $"/r \"{VulnerabilitiesPath}\" /rt \"Vulnerabilities List (CSV)\" ";
 
             proc.ErrorDataReceived += OnErrorData;
 

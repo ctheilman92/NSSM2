@@ -48,6 +48,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\201904210024103_InitialCreate.cs" />
+    <Compile Include="Migrations\201904210024103_InitialCreate.Designer.cs">
+      <DependentUpon>201904210024103_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904211505345_nxt.cs" />
+    <Compile Include="Migrations\201904211505345_nxt.Designer.cs">
+      <DependentUpon>201904211505345_nxt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Member.cs" />
     <Compile Include="Models\ModelBase.cs" />
     <Compile Include="Models\Node.cs" />
@@ -59,6 +68,14 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201904210024103_InitialCreate.resx">
+      <DependentUpon>201904210024103_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904211505345_nxt.resx">
+      <DependentUpon>201904211505345_nxt.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
