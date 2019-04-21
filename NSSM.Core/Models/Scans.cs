@@ -51,6 +51,7 @@ namespace NSSM.Core.Models
         Pending=1,
         Running=2,
         Error=3,
-        Complete=4
+        Complete=4,
+        Terminated=5
     }
 }

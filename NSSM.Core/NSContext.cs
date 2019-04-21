@@ -3,8 +3,24 @@ namespace NSSM2.Core
     using NSSM.Core.Models;
     using System;
     using System.Data.Entity;
+    using System.Data.Entity.Infrastructure;
     using System.Linq;
     using System.Threading.Tasks;
+
+    public class NSContextInitializer : CreateDatabaseIfNotExists<NSContext>
+    {
+        protected override void Seed(NSContext context)
+        {
+            context.Members.Add(new Member
+            {
+                FirstName = "Admin",
+                LastName = "Admin",
+                Email = "Admin@admin.com",
+            });
+
+            base.Seed(context);
+        }
+    }
 
     public class NSContext : DbContext
     {
@@ -15,7 +31,7 @@ namespace NSSM2.Core
         public NSContext(string connectionString)
             : base(connectionString)
         {
-            Database.SetInitializer(new CreateDatabaseIfNotExists<NSContext>());
+            Database.SetInitializer(new NSContextInitializer());
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -30,6 +46,8 @@ namespace NSSM2.Core
 
             modelBuilder.Properties<DateTime>()
                 .Configure(property => property.HasColumnType("datetime2"));
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public override int SaveChanges()
@@ -47,7 +65,7 @@ namespace NSSM2.Core
         private void UpdateBaseEntities()
         {
             var entities = ChangeTracker.Entries().Where(x => x.Entity is ModelBase
-                && x.State == EntityState.Added || x.State == EntityState.Modified);
+                && (x.State == EntityState.Added || x.State == EntityState.Modified || x.State == EntityState.Deleted));
 
             foreach (var e in entities)
             {
@@ -58,6 +76,11 @@ namespace NSSM2.Core
                         ((ModelBase)e.Entity).IsActive = true;
                         ((ModelBase)e.Entity).IsDeleted = false;
                         ((ModelBase)e.Entity).CreatedDate = DateTime.Now;
+                    }
+                    else if (e.State == EntityState.Deleted)
+                    {
+                        e.State = EntityState.Modified;
+                        ((ModelBase)e.Entity).IsDeleted = true;
                     }
 
                     ((ModelBase)e.Entity).ModifiedDate = DateTime.Now;

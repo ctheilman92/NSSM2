@@ -10,10 +10,6 @@ namespace NSSM2.Controllers
     {
         public ActionResult Index()
         {
-            using (var db = GetNSContext())
-            {
-                var lst = db.Projects.ToList();
-            }
             return View();
         }
 
