@@ -12,8 +12,9 @@ namespace NSSM.Scheduler
 {
     public partial class NSSMScheduler : ServiceBase
     {
-        private Timer _Timer { get; set; }
+        private Timer _Timer = new Timer();
         public EventLog _EventLog { get; set; }
+        public Node _Node { get;set; }
         public override EventLog EventLog
         {
             get
@@ -33,7 +34,7 @@ namespace NSSM.Scheduler
         {
             using (var db = Utility.GetNSContext())
             {
-                var alias = ConfigurationManager.AppSettings["ALIAS"];
+                var alias = Environment.MachineName;
                 var thisNode = db.Nodes.FirstOrDefault(x => x.Alias.Equals(alias, StringComparison.OrdinalIgnoreCase));
 
                 if (thisNode == null)

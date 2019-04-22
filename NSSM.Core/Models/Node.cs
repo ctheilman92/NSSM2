@@ -12,21 +12,19 @@ namespace NSSM.Core.Models
         [Column(name: "ALIAS")]
         public string Alias { get; set; }
 
-        [Required]
         [Column(name: "FQDN")]
         public string FQDN { get; set; }
 
-        [Required]
         [Column(name: "DOMAIN")]
         public string Domain { get; set; }
 
         [Required]
         [Column(name: "NS_EXE_LOCATION")]
-        public string ExecutableLocation { get; set; }
+        public string ExecutableLocation { get; set; } = @"C:\Program Files (x86)\Netsparker";
 
         [Required]
         [Column(name: "CONCURRENT_SCANS")]
-        public int Concurrentscans { get; set; }
+        public int Concurrentscans { get; set; } = 2;
 
         [Column(name: "START_TIME")]
         public DateTime? StartTime { get; set; }

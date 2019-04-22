@@ -41,12 +41,12 @@ namespace NSSM.Scheduler
         {
             using (var db = Utility.GetNSContext())
             {
-                var thisAlias = ConfigurationManager.AppSettings["ALIAS"];
+                var thisAlias = Environment.MachineName;
                 return db.Nodes.FirstOrDefault(x => x.Alias.Equals(thisAlias, StringComparison.OrdinalIgnoreCase));
             }
         }
 
-        public static NSContext GetNSContext() => new NSContext("ConnectionString");
+        public static NSContext GetNSContext() => new NSContext("NSCONTEXTCONNSTRING");
 
     }
 }
