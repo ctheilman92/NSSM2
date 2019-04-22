@@ -82,6 +82,7 @@ namespace NSSM.Scheduler
 
         public Task<int> ExecuteScanAsync()
         {
+            ValidateDirectories();
             var tcs = new TaskCompletionSource<int>();
             Process proc = new Process { EnableRaisingEvents = true, };
             proc.StartInfo.FileName = NodeInstance.ExecutableLocation;
@@ -102,6 +103,27 @@ namespace NSSM.Scheduler
             proc.Start();
             return tcs.Task;
         }
+
+        public void ValidateDirectories()
+        {
+            if (!Directory.Exists(ProjectInfo.SummaryLocation))
+                Directory.CreateDirectory(ProjectInfo.SummaryLocation);
+
+            if (Directory.Exists(ReportPath))
+            {
+                Directory.Delete(ReportPath, true);
+                Directory.CreateDirectory(ReportPath);
+
+            }
+
+            if (Directory.Exists(VulnerabilitiesPath))
+            {
+                Directory.Delete(VulnerabilitiesPath, true);
+                Directory.CreateDirectory(ReportPath);
+
+            }
+        }
+
 
         public void OnErrorData(object pSender, DataReceivedEventArgs pError)
         {

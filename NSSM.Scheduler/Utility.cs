@@ -12,6 +12,14 @@ namespace NSSM.Scheduler
 {
     public static class Utility
     {
+        public static string _ConnectionString
+        {
+            get
+            {
+                return ConfigurationManager.ConnectionStrings["NSCONTEXTCONNSTRING"].ConnectionString;
+            }
+        }
+
         public static string GetAssemblyPath()
         {
             var assemblyUri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
@@ -42,11 +50,28 @@ namespace NSSM.Scheduler
             using (var db = Utility.GetNSContext())
             {
                 var thisAlias = Environment.MachineName;
-                return db.Nodes.FirstOrDefault(x => x.Alias.Equals(thisAlias, StringComparison.OrdinalIgnoreCase));
+                var thisNode = db.Nodes.ToList().FirstOrDefault(x => x.Alias.Equals(thisAlias));
+
+                if (thisNode == null)
+                {
+                    thisNode = new Node
+                    {
+                        Alias = Environment.MachineName,
+                        Concurrentscans = 2,
+                        AdminMemberId = 1, //this needs to be changed later
+                        CreatedbyId = 1,
+                    };
+
+                    db.Nodes.Add(thisNode);
+                    if (db.SaveChanges() == 0)
+                        throw new Exception("Could not create Node Instance..");
+                }
+
+                return thisNode;
             }
         }
 
-        public static NSContext GetNSContext() => new NSContext("NSCONTEXTCONNSTRING");
+        public static NSContext GetNSContext() => new NSContext(_ConnectionString);
 
     }
 }

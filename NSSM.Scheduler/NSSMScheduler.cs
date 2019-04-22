@@ -38,23 +38,38 @@ namespace NSSM.Scheduler
                 var thisNode = db.Nodes.FirstOrDefault(x => x.Alias.Equals(alias, StringComparison.OrdinalIgnoreCase));
 
                 if (thisNode == null)
-                    throw new NullReferenceException("Node instance cannot be null..");
-
-                if (isActive)
                 {
-                    thisNode.IsActive = true;
-                    thisNode.StartTime = DateTime.Now;
-                    thisNode.StopTime = null;
+                    db.Nodes.Add(new Node
+                    {
+                        Alias = alias,
+                        Domain = "CROWE",
+                        Concurrentscans = 2,
+                        IsActive = true,
+                        StartTime = DateTime.Now,
+                    });
+
+                    if (db.SaveChanges() == 0)
+                        throw new ArgumentException("Could not create node record..");
                 }
                 else
                 {
-                    thisNode.IsActive = false;
-                    thisNode.StopTime = DateTime.Now;
-                    thisNode.StartTime = null;
-                }
+                    if (isActive)
+                    {
+                        thisNode.IsActive = true;
+                        thisNode.StartTime = DateTime.Now;
+                        thisNode.StopTime = null;
+                    }
+                    else
+                    {
+                        thisNode.IsActive = false;
+                        thisNode.StopTime = DateTime.Now;
+                        thisNode.StartTime = null;
+                    }
 
-                db.Entry(thisNode).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
+                    db.Entry(thisNode).State = System.Data.Entity.EntityState.Modified;
+                    if (db.SaveChanges() == 0)
+                        throw new ArgumentException("Could not update node record..");
+                }
             }
         }
 

@@ -7,7 +7,7 @@ namespace NSSM2.Core
     using System.Linq;
     using System.Threading.Tasks;
 
-    public class NSContextInitializer : DropCreateDatabaseIfModelChanges<NSContext>
+    public class NSContextInitializer : CreateDatabaseIfNotExists<NSContext>
     {
         protected override void Seed(NSContext context)
         {
@@ -24,10 +24,11 @@ namespace NSSM2.Core
 
     public class NSContext : DbContext
     {
-        //public NSContext()
-        //    : base("NSCONTEXTCONNSTRING")
-        //{
-        //}
+        //uncomment this when running code-first migration (model changes)
+        public NSContext()
+            : base("NSCONTEXTCONNSTRING")
+        {
+        }
 
         public NSContext(string connectionString)
             : base(connectionString)

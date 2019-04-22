@@ -19,21 +19,6 @@ namespace NSSM.Scheduler
 
         private void ServiceInstaller1_AfterInstall(object sender, InstallEventArgs e)
         {
-            using (var db = Utility.GetNSContext())
-            {
-                var nodeAlias = Environment.MachineName;
-                if (!db.Nodes.Any(x => !x.IsDeleted && x.Alias.Equals(nodeAlias)))
-                {
-                    db.Nodes.Add(new Node
-                    {
-                        Alias = nodeAlias,
-                        Domain = "CROWE",
-                        Concurrentscans = 2,
-                    });
-
-                    db.SaveChanges();
-                }
-            }
         }
     }
 }

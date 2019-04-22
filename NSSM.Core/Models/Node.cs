@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NSSM.Core.Models
 {
-    [Table(name: "NS_NODE")]
+    [Table(name: "NS_NODES")]
     public class Node : ModelBase
     {
         [Required]
