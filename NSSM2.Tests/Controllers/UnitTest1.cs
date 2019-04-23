@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSSM.Core.Models;
@@ -11,34 +12,6 @@ using NSSM2.Core;
 
 namespace NSSM2.Tests.Controllers
 {
-    public static class DBLogger
-    {
-        public static void Log(string message)
-        {
-            Debug.WriteLine("EF OUTPUT: {0} ", message);
-        }
-    }
-
-
-    [TestClass]
-    public class TestBase
-    {
-        public static string _ConnectionString
-        {
-            get
-            {
-                return ConfigurationManager.ConnectionStrings["NSCONTEXTCONNSTRING"].ConnectionString;
-            }
-        }
-
-        private NSContext GetNSContext()
-        {
-            var nsContext = new NSContext(_ConnectionString);
-            nsContext.Database.Log = DBLogger.Log;
-            return nsContext;
-        }
-    }
-
 
     [TestClass]
     public class UnitTest1 : TestBase
@@ -57,11 +30,16 @@ namespace NSSM2.Tests.Controllers
 
             Debug.Assert(testProj != null);
             Debug.Assert(scans != null);
-            foreach (var scan in scans)
+
+            var nsCredentials = new NSCredendtials(string.Empty, "netsparker_sa", "F@l#tvCzP5e8Ga7FC%N%qQSzRETQBmKR%oN#r2sKF6nd@x0^HMd!8iyHtec^X&v@");
+            using (var nsImpersonate = new NSImpersonation(nsCredentials))
             {
-                var procScan = new NSProcess(scan, testProj);
-                var result = await procScan.ExecuteScanAsync();
-                Debug.Assert(result == 0);
+                foreach (var scan in scans)
+                {
+                    var procScan = new NSProcess(scan, testProj);
+                    var result = await procScan.ExecuteScanAsync();
+                    Debug.Assert(result == 0);
+                }
             }
         }
 
