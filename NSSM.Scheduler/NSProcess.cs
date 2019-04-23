@@ -34,41 +34,17 @@ namespace NSSM.Scheduler
         {
             get
             {
-                if (this.NodeInstance == null)
+                if (_NodeInstance == null)
                     _NodeInstance = Utility.GetNodeInstance();
                 return _NodeInstance;
             }
         }
 
-        private string ReportPath
-        {
-            get
-            {
-                if (CurrentScan == null)
-                    return string.Empty;
-                var scanExportPath = Path.Combine(ProjectInfo.SummaryLocation, CurrentScan.ScanAlias);
-
-                return (!string.IsNullOrEmpty(CurrentScan.ScanAlias))
-                    ? Path.Combine(scanExportPath, $"Report-{CurrentScan.TargetUrl}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.pdf")
-                    : Path.Combine(scanExportPath, $"Report-SCAN#{CurrentScan.Id}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.pdf");
-            }
-        }
-
-        private string VulnerabilitiesPath
-        {
-            get
-            {
-                if (CurrentScan == null)
-                    return string.Empty;
-                var scanExportPath = Path.Combine(ProjectInfo.SummaryLocation, CurrentScan.ScanAlias);
-
-                return (!string.IsNullOrEmpty(CurrentScan.ScanAlias))
-                    ? Path.Combine(CurrentScan.ExportPath, $"Vulnerabilities-SCAN#{CurrentScan.ScanAlias}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.csv")
-                    : Path.Combine(CurrentScan.ExportPath, $"Vulnerabilities-SCAN#{CurrentScan.Id}-{DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}.csv");
-            }
-        }
-
         public string ProcessErrors { get; set; }
+
+        private TaskCompletionSource<int> _tcs { get; set; }
+
+        private Process _process { get; set; }
         
         public NSProcess(Scan scan)
         {
@@ -82,48 +58,58 @@ namespace NSSM.Scheduler
 
         public Task<int> ExecuteScanAsync()
         {
-            ValidateDirectories();
-            var tcs = new TaskCompletionSource<int>();
-            Process proc = new Process { EnableRaisingEvents = true, };
-            proc.StartInfo.FileName = NodeInstance.ExecutableLocation;
-            proc.StartInfo.Arguments = $"/u {CurrentScan.TargetUrl} ";
-            proc.StartInfo.Arguments += $"/p \"Default Scan Policy\" /a /s ";
-            proc.StartInfo.Arguments += $"/r \"{ReportPath}\" /rt \"Detailed Scan Report\" ";
-            proc.StartInfo.Arguments += $"/r \"{VulnerabilitiesPath}\" /rt \"Vulnerabilities List (CSV)\" ";
+            _tcs = new TaskCompletionSource<int>();
+            _process = new Process { EnableRaisingEvents = true };
+            _process.Exited += OnProcessExit;
+            _process.ErrorDataReceived += OnErrorData;
+            _process.OutputDataReceived += OnOutputData;
 
-            proc.ErrorDataReceived += OnErrorData;
+            UpdateScan(ScanStatus.Running);
 
-            proc.Exited += (sender, args) =>
-            {
-                UpdateScan(ScanStatus.Complete);
-                tcs.SetResult(proc.ExitCode);
-                proc.Dispose();
-            };
+            var reportFileName = $"Report-{CurrentScan.Id}.pdf";
+            var vulnerabilityFileName = $"Vulnerabilities-{CurrentScan.Id}.csv";
 
-            proc.Start();
-            return tcs.Task;
-        }
+            var scanPath = (!string.IsNullOrEmpty(CurrentScan.ScanAlias))
+                ? Path.Combine(ProjectInfo.SummaryLocation, CurrentScan.ScanAlias)
+                : Path.Combine(ProjectInfo.SummaryLocation, $"SCAN_{CurrentScan.Id}");
 
-        public void ValidateDirectories()
-        {
             if (!Directory.Exists(ProjectInfo.SummaryLocation))
                 Directory.CreateDirectory(ProjectInfo.SummaryLocation);
 
-            if (Directory.Exists(ReportPath))
+            if (Directory.Exists(Path.GetDirectoryName(scanPath)))
+                Directory.Delete(Path.GetDirectoryName(scanPath), true);
+
+            Directory.CreateDirectory(scanPath);
+
+            var arguments = $"/u \"{CurrentScan.TargetUrl}\" ";
+            arguments += $"/p \"Default Scan Policy\" /a /s ";
+            arguments += $"/r \"{Path.Combine(scanPath, reportFileName)}\" /rt \"Detailed Scan Report\" ";
+            arguments += $"/r \"{Path.Combine(scanPath, vulnerabilityFileName)}\" /rt \"Vulnerabilities List (CSV)\" ";
+
+            _process.StartInfo = new ProcessStartInfo
             {
-                Directory.Delete(ReportPath, true);
-                Directory.CreateDirectory(ReportPath);
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                Arguments = arguments,
+                FileName = NodeInstance.ExecutableLocation
+            };
 
-            }
-
-            if (Directory.Exists(VulnerabilitiesPath))
-            {
-                Directory.Delete(VulnerabilitiesPath, true);
-                Directory.CreateDirectory(ReportPath);
-
-            }
+            _process.Start();
+            return _tcs.Task;
         }
 
+        private void OnOutputData(object sender, DataReceivedEventArgs e)
+        {
+            Debug.WriteLine(e.Data);
+        }
+
+        private void OnProcessExit(object sender, EventArgs e)
+        {
+            _tcs.SetResult(_process.ExitCode);
+            _process.Dispose();
+            UpdateScan(ScanStatus.Complete);
+        }
 
         public void OnErrorData(object pSender, DataReceivedEventArgs pError)
         {

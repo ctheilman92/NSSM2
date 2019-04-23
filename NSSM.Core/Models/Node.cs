@@ -20,7 +20,7 @@ namespace NSSM.Core.Models
 
         [Required]
         [Column(name: "NS_EXE_LOCATION")]
-        public string ExecutableLocation { get; set; } = @"C:\Program Files (x86)\Netsparker";
+        public string ExecutableLocation { get; set; } = @"C:\Program Files (x86)\Netsparker\Netsparker.exe";
 
         [Required]
         [Column(name: "CONCURRENT_SCANS")]

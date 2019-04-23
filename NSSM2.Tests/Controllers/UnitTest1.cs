@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,11 +23,11 @@ namespace NSSM2.Tests.Controllers
     [TestClass]
     public class TestBase
     {
-        public string _ConnectionString
+        public static string _ConnectionString
         {
             get
             {
-                return "Server=tcp:crowenetsparker.database.windows.net,1433;Initial Catalog=netsparker;Persist Security Info=False;User ID=netsparker_sql;Password=Q2di$P7O@sqAfJn*;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+                return ConfigurationManager.ConnectionStrings["NSCONTEXTCONNSTRING"].ConnectionString;
             }
         }
 
@@ -60,7 +61,7 @@ namespace NSSM2.Tests.Controllers
             {
                 var procScan = new NSProcess(scan, testProj);
                 var result = await procScan.ExecuteScanAsync();
-                Debug.Assert(result > 0);
+                Debug.Assert(result == 0);
             }
         }
 
@@ -87,21 +88,25 @@ namespace NSSM2.Tests.Controllers
                 {
                     TargetUrl = @"http://aspnet.testsparker.com/",
                     ExportPath = @"C:\Users\Raul Martinez\Desktop\Output\Scan0",
+                    Status = ScanStatus.Pending,
                 },
                 new Scan
                 {
                     TargetUrl = @"http://php.testsparker.com/",
                     ExportPath = @"C:\Users\Raul Martinez\Desktop\Output\Scan1",
+                    Status = ScanStatus.Pending,
                 },
                 new Scan
                 {
                     TargetUrl = @"http://aspnet.testsparker.com/",
                     ExportPath = @"C:\Users\Raul Martinez\Desktop\Output\Scan2",
+                    Status = ScanStatus.Pending,
                 },
                 new Scan
                 {
                     TargetUrl = @"http://php.testsparker.com/",
                     ExportPath = @"C:\Users\Raul Martinez\Desktop\Output\Scan3",
+                    Status = ScanStatus.Pending,
                 },
             };
 
