@@ -3,100 +3,83 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace NSSM.Scheduler
 {
     public class NSProcess
     {
-        public Scan CurrentScan { get; set; }
-
+        public Scan _CurrentScan { get; set; }
         private Project _ProjectInfo { get; set; }
-        public Project ProjectInfo
-        {
-            get
-            {
-                if (_ProjectInfo == null)
-                {
-                    if (CurrentScan == null)
-                        throw new ArgumentException("Current scan is unavailable. Cannot process project information..");
-                    using (var db = Utility.GetNSContext())
-                    {
-                        return db.Projects.FirstOrDefault(x => x.Id == CurrentScan.ProjectId);
-                    }
-                }
-                return _ProjectInfo;
-            }
-        }
-
         private Node _NodeInstance { get; set; }
-        public Node NodeInstance
-        {
-            get
-            {
-                if (_NodeInstance == null)
-                    _NodeInstance = Utility.GetNodeInstance();
-                return _NodeInstance;
-            }
-        }
-
-        public string ProcessErrors { get; set; }
-
         private TaskCompletionSource<int> _tcs { get; set; }
 
-        private Process _process { get; set; }
+        public string processErrors { get; set; }
+
+
+        private Process process { get; set; }
         
-        public NSProcess(Scan scan)
+        public NSProcess(Scan scan, Project projectInfo, Node nodeInstance)
         {
-            CurrentScan = scan;
-        }
-        public NSProcess(Scan scan, Project project)
-        {
-            CurrentScan = scan;
-            _ProjectInfo = project;
+            _CurrentScan = scan;
+            _ProjectInfo = projectInfo;
+            _NodeInstance = nodeInstance;
         }
 
         public Task<int> ExecuteScanAsync()
         {
             _tcs = new TaskCompletionSource<int>();
-            _process = new Process { EnableRaisingEvents = true };
-            _process.Exited += OnProcessExit;
-            _process.ErrorDataReceived += OnErrorData;
-            _process.OutputDataReceived += OnOutputData;
+            process = new Process { EnableRaisingEvents = true };
 
-            UpdateScan(ScanStatus.Running);
+            Utility.UpdateScan(_CurrentScan, ScanStatus.Running, _NodeInstance.Id, string.Empty);
 
-            var reportFileName = $"Report-{CurrentScan.Id}.pdf";
-            var vulnerabilityFileName = $"Vulnerabilities-{CurrentScan.Id}.csv";
+            var reportFileName = $"Report-{_CurrentScan.Id}.pdf";
+            var vulnerabilityFileName = $"Vulnerabilities-{_CurrentScan.Id}.csv";
 
-            var scanPath = (!string.IsNullOrEmpty(CurrentScan.ScanAlias))
-                ? Path.Combine(ProjectInfo.SummaryLocation, CurrentScan.ScanAlias)
-                : Path.Combine(ProjectInfo.SummaryLocation, $"SCAN_{CurrentScan.Id}");
+            var scanPath = (!string.IsNullOrEmpty(_CurrentScan.ScanAlias))
+                ? Path.Combine(_ProjectInfo.SummaryLocation, _CurrentScan.ScanAlias)
+                : Path.Combine(_ProjectInfo.SummaryLocation, $"SCAN_{_CurrentScan.Id}");
 
-            if (!Directory.Exists(ProjectInfo.SummaryLocation))
-                Directory.CreateDirectory(ProjectInfo.SummaryLocation);
+            if (!Directory.Exists(_ProjectInfo.SummaryLocation))
+                Directory.CreateDirectory(_ProjectInfo.SummaryLocation);
 
-            if (Directory.Exists(Path.GetDirectoryName(scanPath)))
-                Directory.Delete(Path.GetDirectoryName(scanPath), true);
+            if (!Directory.Exists(scanPath))
+                Directory.CreateDirectory(scanPath);
 
-            Directory.CreateDirectory(scanPath);
-
-            var arguments = $"/u \"{CurrentScan.TargetUrl}\" ";
+            var arguments = $"/u \"{_CurrentScan.TargetUrl}\" ";
             arguments += $"/p \"Default Scan Policy\" /a /s ";
             arguments += $"/r \"{Path.Combine(scanPath, reportFileName)}\" /rt \"Detailed Scan Report\" ";
             arguments += $"/r \"{Path.Combine(scanPath, vulnerabilityFileName)}\" /rt \"Vulnerabilities List (CSV)\" ";
 
-            _process.StartInfo = new ProcessStartInfo
+            process.StartInfo = new ProcessStartInfo
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
-                RedirectStandardOutput = true,
                 Arguments = arguments,
-                FileName = NodeInstance.ExecutableLocation
+                FileName = _NodeInstance.ExecutableLocation,
+                WorkingDirectory = Path.GetDirectoryName(_NodeInstance.ExecutableLocation),
+                //UserName = "netsparker_sa",
+                //Password = GetSecurePassword("F@l#tvCzP5e8Ga7FC%N%qQSzRETQBmKR%oN#r2sKF6nd@x0^HMd!8iyHtec^X&v@")
             };
 
-            _process.Start();
+            process.Exited += OnProcessExit;
+            process.ErrorDataReceived += OnErrorData;
+            process.OutputDataReceived += OnOutputData;
+
+            process.Start();
             return _tcs.Task;
+        }
+
+        private SecureString GetSecurePassword(string password)
+        {
+            var secureString = new SecureString();
+            foreach (char c in password.ToCharArray())
+            {
+                secureString.AppendChar(c);
+            }
+
+            return secureString;
         }
 
         private void OnOutputData(object sender, DataReceivedEventArgs e)
@@ -106,41 +89,15 @@ namespace NSSM.Scheduler
 
         private void OnProcessExit(object sender, EventArgs e)
         {
-            _tcs.SetResult(_process.ExitCode);
-            _process.Dispose();
-            UpdateScan(ScanStatus.Complete);
+            Utility.UpdateScan(_CurrentScan, ScanStatus.Complete, _NodeInstance.Id, processErrors);
+            _tcs.SetResult(process.ExitCode);
+            process.Dispose();
         }
 
         public void OnErrorData(object pSender, DataReceivedEventArgs pError)
         {
-            ProcessErrors = pError.Data;
-            UpdateScan(ScanStatus.Error);
-        }
-
-        public void UpdateScan(ScanStatus status)
-        {
-            CurrentScan.Status = status;
-            switch (status)
-            {
-                case ScanStatus.Running:
-                    CurrentScan.InvokeDate = DateTime.Now;
-                    CurrentScan.NodeInstanceId = NodeInstance.Id;
-                    break;
-                case ScanStatus.Error:
-                    CurrentScan.Error = ProcessErrors;
-                    break;
-                case ScanStatus.Complete:
-                    CurrentScan.EndDate = DateTime.Now;
-                    break;
-                default:
-                    break;
-            }
-
-            using (var db = Utility.GetNSContext())
-            {
-                db.Entry(CurrentScan).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
-            }
+            processErrors = pError.Data;
+            Utility.UpdateScan(_CurrentScan, ScanStatus.Error, _NodeInstance.Id, processErrors);
         }
     }
 }

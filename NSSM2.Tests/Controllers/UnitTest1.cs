@@ -20,8 +20,11 @@ namespace NSSM2.Tests.Controllers
         [TestMethod]
         public async Task TestExecuteScan()
         {
+
+            var successfulScans = 0;
             Project testProj = null;
             List<Scan> scans = null;
+
             using (var db = new NSContext(_ConnectionString))
             {
                 testProj = db.Projects.FirstOrDefault();
@@ -31,16 +34,13 @@ namespace NSSM2.Tests.Controllers
             Debug.Assert(testProj != null);
             Debug.Assert(scans != null);
 
-            var nsCredentials = new NSCredendtials(string.Empty, "netsparker_sa", "F@l#tvCzP5e8Ga7FC%N%qQSzRETQBmKR%oN#r2sKF6nd@x0^HMd!8iyHtec^X&v@");
-            using (var nsImpersonate = new NSImpersonation(nsCredentials))
+            foreach (var scan in scans)
             {
-                foreach (var scan in scans)
-                {
-                    var procScan = new NSProcess(scan, testProj);
-                    var result = await procScan.ExecuteScanAsync();
-                    Debug.Assert(result == 0);
-                }
+                var procScan = new NSProcess(scan, testProj, Utility.GetNodeInstance());
+                var result = await procScan.ExecuteScanAsync();
             }
+
+            Debug.Assert(successfulScans == scans.Count());
         }
 
         [TestMethod]
