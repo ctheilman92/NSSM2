@@ -1,4 +1,5 @@
 ﻿using NSSM.Core.Models;
+using NSSM.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -34,7 +35,7 @@ namespace NSSM.Scheduler
             get
             {
                 if (_NodeInstance == null)
-                    _NodeInstance = Utility.GetNodeInstance();
+                    _NodeInstance = EntityService.GetNodeInstance();
                 return _NodeInstance;
             }
         }
@@ -54,7 +55,7 @@ namespace NSSM.Scheduler
             try
             {
                 EventLog.WriteEntry($"Starting Scheduler service at {DateTime.Now}.");
-                Utility.UpdateNodeInstance(true);
+                EntityService.UpdateNodeInstance(true);
             }
             catch(Exception ex)
             {
@@ -70,7 +71,7 @@ namespace NSSM.Scheduler
         {
             try
             {
-                var availableConnections = Utility.GetNodeInstance().Concurrentscans;
+                var availableConnections = EntityService.GetNodeInstance().Concurrentscans;
                 var scansCount = Utility.GetNetsparkerProcessCount();
                 if (scansCount > 0)
                 {
@@ -84,13 +85,13 @@ namespace NSSM.Scheduler
                     EventLog.WriteEntry($"** Beginning exectution of {availableConnections} netsparker scan son this node! ");
                 }
 
-                var nextScans = Utility.GetNextScans(availableConnections);
+                var nextScans = EntityService.GetNextScans(availableConnections);
                 if (nextScans != null)
                 {
                     foreach (var newScan in nextScans)
                     {
-                        var nodeInstance = Utility.GetNodeInstance();
-                        var project = Utility.GetProjectInfo(newScan);
+                        var nodeInstance = EntityService.GetNodeInstance();
+                        var project = EntityService.GetProjectInfo(newScan);
 
                         var newScanProcess = new NSProcess(newScan, project, nodeInstance);
                         await newScanProcess.ExecuteScanAsync();
@@ -108,7 +109,7 @@ namespace NSSM.Scheduler
             try
             {
                 EventLog.WriteEntry("Stopping Scheduler service.");
-                Utility.UpdateNodeInstance(false);
+                EntityService.UpdateNodeInstance(false);
             }
             catch (Exception ex)
             {

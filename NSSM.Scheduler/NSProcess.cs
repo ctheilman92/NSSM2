@@ -1,4 +1,5 @@
 ﻿using NSSM.Core.Models;
+using NSSM.Core.Services;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -32,7 +33,7 @@ namespace NSSM.Scheduler
             _tcs = new TaskCompletionSource<int>();
             process = new Process { EnableRaisingEvents = true };
 
-            Utility.UpdateScan(_CurrentScan, ScanStatus.Running, _NodeInstance.Id, string.Empty);
+            EntityService.UpdateScan(_CurrentScan, ScanStatus.Running, _NodeInstance.Id, string.Empty);
 
             var reportFileName = $"Report-{_CurrentScan.Id}.pdf";
             var vulnerabilityFileName = $"Vulnerabilities-{_CurrentScan.Id}.csv";
@@ -89,7 +90,7 @@ namespace NSSM.Scheduler
 
         private void OnProcessExit(object sender, EventArgs e)
         {
-            Utility.UpdateScan(_CurrentScan, ScanStatus.Complete, _NodeInstance.Id, processErrors);
+            EntityService.UpdateScan(_CurrentScan, ScanStatus.Complete, _NodeInstance.Id, processErrors);
             _tcs.SetResult(process.ExitCode);
             process.Dispose();
         }
@@ -97,7 +98,7 @@ namespace NSSM.Scheduler
         public void OnErrorData(object pSender, DataReceivedEventArgs pError)
         {
             processErrors = pError.Data;
-            Utility.UpdateScan(_CurrentScan, ScanStatus.Error, _NodeInstance.Id, processErrors);
+            EntityService.UpdateScan(_CurrentScan, ScanStatus.Error, _NodeInstance.Id, processErrors);
         }
     }
 }

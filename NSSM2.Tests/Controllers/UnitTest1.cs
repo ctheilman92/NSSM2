@@ -7,6 +7,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSSM.Core.Models;
+using NSSM.Core.Services;
 using NSSM.Scheduler;
 using NSSM2.Core;
 
@@ -36,7 +37,7 @@ namespace NSSM2.Tests.Controllers
 
             foreach (var scan in scans)
             {
-                var procScan = new NSProcess(scan, testProj, Utility.GetNodeInstance());
+                var procScan = new NSProcess(scan, testProj, EntityService.GetNodeInstance());
                 var result = await procScan.ExecuteScanAsync();
             }
 
@@ -46,7 +47,7 @@ namespace NSSM2.Tests.Controllers
         [TestMethod]
         public void TestGetNode()
         {
-            var thisNode = Utility.GetNodeInstance();
+            var thisNode = EntityService.GetNodeInstance();
             Debug.Assert(thisNode != null && thisNode.Id > 0);
         }
 

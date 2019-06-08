@@ -33,14 +33,14 @@
             // 
             // serviceProcessInstaller1
             // 
-            this.serviceProcessInstaller1.Password = null;
-            this.serviceProcessInstaller1.Username = null;
+
+            this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.LocalService;
             // 
             // serviceInstaller1
             // 
             this.serviceInstaller1.DisplayName = "NssmScheduler";
             this.serviceInstaller1.ServiceName = "NSSM Scheduler";
-            this.serviceInstaller1.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.ServiceInstaller1_AfterInstall);
+            //this.serviceInstaller1.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.ServiceInstaller1_AfterInstall);
             // 
             // ProjectInstaller
             // 
