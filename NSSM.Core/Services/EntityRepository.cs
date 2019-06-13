@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NSSM.Core.Models;
 using NSSM2.Core;
 
@@ -80,6 +78,8 @@ namespace NSSM.Core.Services
                         Concurrentscans = 2,
                         IsActive = true,
                         StartTime = DateTime.Now,
+                        AdminMemberId = 1,
+                        CreatedbyId = 1
                     });
 
                     if (db.SaveChanges() == 0)
