@@ -94,7 +94,7 @@ namespace NSSM.Scheduler
                         var project = EntityService.GetProjectInfo(newScan);
 
                         var newScanProcess = new NSProcess(newScan, project, nodeInstance);
-                        await newScanProcess.ExecuteScanAsync();
+                        var tResult = await newScanProcess.ExecuteScanAsync();
                     }
                 }
             }

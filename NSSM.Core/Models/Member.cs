@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NSSM.Core.Models
 {
+
     [Table(name: "NS_MEMBERS")]
     public class Member : ModelBase
     {
@@ -17,8 +18,7 @@ namespace NSSM.Core.Models
         public string LastName { get; set; }
 
         [Required]
-        [NotMapped]
-        public Guid ADContextKey { get; set; }
+        public Guid? ADContextKey { get; set; }
 
         [Required]
         [Column(name: "EMAIL")]

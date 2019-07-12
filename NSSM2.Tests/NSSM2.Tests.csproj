@@ -117,9 +117,9 @@
       <Project>{c389304d-bdee-4e52-90cf-61c8365efe93}</Project>
       <Name>NSSM.Scheduler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NSSM2\NSSM2.csproj">
-      <Project>{DA51F24E-E547-4D8A-B49C-45B7FD11FCAF}</Project>
-      <Name>NSSM2</Name>
+    <ProjectReference Include="..\NSSM2.App\NSSM2.App.csproj">
+      <Project>{4b0cbfb1-4ca1-45a5-9256-69f66db20526}</Project>
+      <Name>NSSM2.App</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

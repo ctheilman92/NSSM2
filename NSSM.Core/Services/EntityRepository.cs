@@ -9,6 +9,11 @@ namespace NSSM.Core.Services
 {
     internal class EntityRepository : IEntityRepository
     {
+        /*
+         * do we really need to have this repository pattern if we are using entity framework?
+         * no...but we can do away with this later.
+         */
+
         public static string _ConnectionString
         {
             get
@@ -132,5 +137,6 @@ namespace NSSM.Core.Services
                 db.SaveChanges();
             }
         }
+
     }
 }

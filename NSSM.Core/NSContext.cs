@@ -25,10 +25,10 @@ namespace NSSM2.Core
     public class NSContext : DbContext
     {
         //uncomment this when running code-first migration (model changes)
-        public NSContext()
-            : base("NSCONTEXTCONNSTRING")
-        {
-        }
+        //public NSContext()
+        //    : base("NSCONTEXTCONNSTRING")
+        //{
+        //}
 
         public NSContext(string connectionString)
             : base(connectionString)
